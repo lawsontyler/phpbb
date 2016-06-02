@@ -1,31 +1,55 @@
 services:
-    attachment.delete:
-        class: phpbb\attachment\delete
+    attachment.manager:
+        class: phpbb\attachment\manager
+        shared: false
+        arguments:
+            - '@config'
+            - '@attachment.input.driver_collection'
+            - '@attachment.storage.driver_collection'
+
+# ----- Attachment drivers -----
+    attachment.input.driver_collection:
+        class: phpbb\di\service_collection
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: service_collection, tag: attachments.driver.input }
+
+    attachment.storage.driver_collection:
+        class: phpbb\di\service_collection
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: service_collection, tag: attachments.driver.storage }
+
+    attachment.driver.input.upload:
+        class: phpbb\attachment\drivers\input\upload
+        arguments:
+            - '@attachment.local.delete'
+            - '@attachment.local.resync'
+            - '@attachment.local.upload'
+        tags:
+            - { name: attachments.driver.input }
+
+    attachment.local.delete:
+        class: phpbb\attachment\drivers\input\upload\delete
         shared: false
         arguments:
             - '@config'
             - '@dbal.conn'
             - '@dispatcher'
             - '@filesystem'
-            - '@attachment.resync'
+            - '@attachment.local.resync'
             - '%core.root_path%'
 
-    attachment.manager:
-        class: phpbb\attachment\manager
-        shared: false
-        arguments:
-            - '@attachment.delete'
-            - '@attachment.resync'
-            - '@attachment.upload'
-
-    attachment.resync:
-        class: phpbb\attachment\resync
+    attachment.local.resync:
+        class: phpbb\attachment\drivers\input\upload\resync
         shared: false
         arguments:
             - '@dbal.conn'
 
-    attachment.upload:
-        class: phpbb\attachment\upload
+    attachment.local.upload:
+        class: phpbb\attachment\drivers\input\upload\upload
         shared: false
         arguments:
             - '@auth'

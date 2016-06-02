@@ -48,6 +48,7 @@ $lang = array_merge($lang, array(
 	'ALLOWED_FORUMS_EXPLAIN'			=> 'Able to post the assigned extensions at the selected (or all if selected) forums.',
 	'ALLOWED_IN_PM_POST'				=> 'Allowed',
 	'ALLOW_ATTACHMENTS'					=> 'Allow attachments',
+	'ALLOW_ATTACHMENTS_INPUT_UPLOAD'	=> 'Enable attachment uploads',
 	'ALLOW_ALL_FORUMS'					=> 'Allow all forums',
 	'ALLOW_IN_PM'						=> 'Allowed in private messaging',
 	'ALLOW_PM_ATTACHMENTS'				=> 'Allow attachments in private messages',

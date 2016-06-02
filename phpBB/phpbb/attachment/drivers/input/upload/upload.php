@@ -11,7 +11,7 @@
  *
  */
 
-namespace phpbb\attachment;
+namespace phpbb\attachment\drivers\input\upload;
 
 use phpbb\auth\auth;
 use \phpbb\cache\service;

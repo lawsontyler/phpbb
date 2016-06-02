@@ -24,10 +24,10 @@ class phpbb_attachment_delete_test extends \phpbb_database_test_case
 	/** @var \phpbb\filesystem\filesystem */
 	protected $filesystem;
 
-	/** @var \phpbb\attachment\resync */
+	/** @var \phpbb\attachment\drivers\local\resync */
 	protected $resync;
 
-	/** @var \phpbb\attachment\delete */
+	/** @var \phpbb\attachment\drivers\local\delete */
 	protected $attachment_delete;
 
 	protected $phpbb_root_path;
@@ -46,7 +46,7 @@ class phpbb_attachment_delete_test extends \phpbb_database_test_case
 		$this->config = new \phpbb\config\config(array());
 		$this->db = $this->new_dbal();
 		$db = $this->db;
-		$this->resync = new \phpbb\attachment\resync($this->db);
+		$this->resync = new \phpbb\attachment\drivers\local\resync($this->db);
 		$this->filesystem = $this->getMock('\phpbb\filesystem\filesystem', array('remove', 'exists'));
 		$this->filesystem->expects($this->any())
 			->method('remove')
@@ -56,7 +56,7 @@ class phpbb_attachment_delete_test extends \phpbb_database_test_case
 			->willReturn(true);
 		$this->phpbb_root_path = $phpbb_root_path;
 		$this->dispatcher = new \phpbb_mock_event_dispatcher();
-		$this->attachment_delete = new \phpbb\attachment\delete($this->config, $this->db, $this->dispatcher, $this->filesystem, $this->resync, $phpbb_root_path);
+		$this->attachment_delete = new \phpbb\attachment\drivers\local\delete($this->config, $this->db, $this->dispatcher, $this->filesystem, $this->resync, $phpbb_root_path);
 	}
 
 	public function data_attachment_delete()
@@ -121,7 +121,7 @@ class phpbb_attachment_delete_test extends \phpbb_database_test_case
 			->method('exists')
 			->willReturn($exists_success);
 
-		$this->attachment_delete = new \phpbb\attachment\delete($this->config, $this->db, $this->dispatcher, $this->filesystem, $this->resync, $this->phpbb_root_path);
+		$this->attachment_delete = new \phpbb\attachment\drivers\local\delete($this->config, $this->db, $this->dispatcher, $this->filesystem, $this->resync, $this->phpbb_root_path);
 		$this->assertSame($expected, $this->attachment_delete->unlink_attachment('foobar'));
 	}
 }

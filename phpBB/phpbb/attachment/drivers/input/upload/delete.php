@@ -11,7 +11,7 @@
  *
  */
 
-namespace phpbb\attachment;
+namespace phpbb\attachment\drivers\input\upload;
 
 use \phpbb\config\config;
 use \phpbb\db\driver\driver_interface;

@@ -27,7 +27,7 @@ class acp_attachments
 	/** @var \phpbb\config\config */
 	protected $config;
 
-	/** @var ContainerBuilder */
+	/** @var \Symfony\Component\DependencyInjection\ContainerInterface */
 	protected $phpbb_container;
 
 	/** @var \phpbb\template\template */
@@ -119,6 +119,25 @@ class acp_attachments
 					include($phpbb_root_path . 'includes/functions_posting.' . $phpEx);
 				}
 
+				$phpbb_attachment_manager = $phpbb_container->get('attachment.manager');
+				$attachment_drivers = $phpbb_attachment_manager->get_all_input_drivers();
+
+				$attachment_vars = array();
+				foreach ($attachment_drivers as $current_driver)
+				{
+					$driver = $phpbb_attachment_manager->get_input_driver($current_driver, false);
+
+					/*
+					* First grab the settings for enabling/disabling the attachment
+					* driver and afterwards grab additional settings the driver
+					* might have.
+					*/
+					$attachment_vars += $phpbb_attachment_manager->get_attachment_settings($driver);
+					$attachment_vars += $driver->prepare_form_acp($user);
+				}
+
+				var_dump($attachment_vars);
+
 				$sql = 'SELECT group_name, cat_id
 					FROM ' . EXTENSION_GROUPS_TABLE . '
 					WHERE cat_id > 0
@@ -158,16 +177,22 @@ class acp_attachments
 						'secure_allow_deny'		=> array('lang' => 'SECURE_ALLOW_DENY',		'validate' => 'int',	'type' => 'custom', 'method' => 'select_allow_deny', 'explain' => true),
 						'secure_allow_empty_referer'	=> array('lang' => 'SECURE_EMPTY_REFERRER', 'validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => true),
 						'check_attachment_content' 		=> array('lang' => 'CHECK_CONTENT', 'validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => true),
-
-						'legend2'					=> $l_legend_cat_images,
-						'img_display_inlined'		=> array('lang' => 'DISPLAY_INLINED',		'validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => true),
-						'img_create_thumbnail'		=> array('lang' => 'CREATE_THUMBNAIL',		'validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => true),
-						'img_max_thumb_width'		=> array('lang' => 'MAX_THUMB_WIDTH',		'validate' => 'int:0:999999999999999',	'type' => 'number:0:999999999999999', 'explain' => true, 'append' => ' ' . $user->lang['PIXEL']),
-						'img_min_thumb_filesize'	=> array('lang' => 'MIN_THUMB_FILESIZE',	'validate' => 'int:0:999999999999999',	'type' => 'number:0:999999999999999', 'explain' => true, 'append' => ' ' . $user->lang['BYTES']),
-						'img_imagick'				=> array('lang' => 'IMAGICK_PATH',			'validate' => 'absolute_path',	'type' => 'text:20:200', 'explain' => true, 'append' => '&nbsp;&nbsp;<span>[ <a href="' . $this->u_action . '&amp;action=imgmagick">' . $user->lang['SEARCH_IMAGICK'] . '</a> ]</span>'),
-						'img_max'					=> array('lang' => 'MAX_IMAGE_SIZE',		'validate' => 'int:0:9999',	'type' => 'dimension:0:9999', 'explain' => true, 'append' => ' ' . $user->lang['PIXEL']),
-						'img_link'					=> array('lang' => 'IMAGE_LINK_SIZE',		'validate' => 'int:0:9999',	'type' => 'dimension:0:9999', 'explain' => true, 'append' => ' ' . $user->lang['PIXEL']),
 					)
+				);
+
+				if (!empty($attachment_vars)) {
+					$display_vars['vars'] += $attachment_vars;
+				}
+
+				$display_vars['vars'] += array(
+					'legend2'					=> $l_legend_cat_images,
+					'img_display_inlined'		=> array('lang' => 'DISPLAY_INLINED',		'validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => true),
+					'img_create_thumbnail'		=> array('lang' => 'CREATE_THUMBNAIL',		'validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => true),
+					'img_max_thumb_width'		=> array('lang' => 'MAX_THUMB_WIDTH',		'validate' => 'int:0:999999999999999',	'type' => 'number:0:999999999999999', 'explain' => true, 'append' => ' ' . $user->lang['PIXEL']),
+					'img_min_thumb_filesize'	=> array('lang' => 'MIN_THUMB_FILESIZE',	'validate' => 'int:0:999999999999999',	'type' => 'number:0:999999999999999', 'explain' => true, 'append' => ' ' . $user->lang['BYTES']),
+					'img_imagick'				=> array('lang' => 'IMAGICK_PATH',			'validate' => 'absolute_path',	'type' => 'text:20:200', 'explain' => true, 'append' => '&nbsp;&nbsp;<span>[ <a href="' . $this->u_action . '&amp;action=imgmagick">' . $user->lang['SEARCH_IMAGICK'] . '</a> ]</span>'),
+					'img_max'					=> array('lang' => 'MAX_IMAGE_SIZE',		'validate' => 'int:0:9999',	'type' => 'dimension:0:9999', 'explain' => true, 'append' => ' ' . $user->lang['PIXEL']),
+					'img_link'					=> array('lang' => 'IMAGE_LINK_SIZE',		'validate' => 'int:0:9999',	'type' => 'dimension:0:9999', 'explain' => true, 'append' => ' ' . $user->lang['PIXEL']),
 				);
 
 				$this->new_config = $config;

@@ -16,7 +16,7 @@ class phpbb_attachment_resync_test extends \phpbb_database_test_case
 	/** @var \phpbb\db\driver\driver_interface */
 	protected $db;
 
-	/** @var \phpbb\attachment\resync */
+	/** @var \phpbb\attachment\drivers\local\resync */
 	protected $resync;
 
 	public function getDataSet()
@@ -29,7 +29,7 @@ class phpbb_attachment_resync_test extends \phpbb_database_test_case
 		parent::setUp();
 
 		$this->db = $this->new_dbal();
-		$this->resync = new \phpbb\attachment\resync($this->db);
+		$this->resync = new \phpbb\attachment\drivers\local\resync($this->db);
 	}
 
 	public function data_resync()

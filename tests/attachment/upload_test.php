@@ -48,7 +48,7 @@ class phpbb_attachment_upload_test extends \phpbb_database_test_case
 	/** @var \phpbb\db\driver\driver_interface */
 	protected $db;
 
-	/** @var \phpbb\attachment\upload */
+	/** @var \phpbb\attachment\drivers\local\upload */
 	protected $upload;
 
 	private $filesystem;
@@ -139,7 +139,7 @@ class phpbb_attachment_upload_test extends \phpbb_database_test_case
 		$this->user = new \phpbb\user($this->language, '\phpbb\datetime');
 
 
-		$this->upload = new \phpbb\attachment\upload(
+		$this->upload = new \phpbb\attachment\drivers\local\upload(
 			$this->auth,
 			$this->cache,
 			$this->config,
@@ -231,7 +231,7 @@ class phpbb_attachment_upload_test extends \phpbb_database_test_case
 			$this->request
 		));
 
-		$this->upload = new \phpbb\attachment\upload(
+		$this->upload = new \phpbb\attachment\drivers\local\upload(
 			$this->auth,
 			$this->cache,
 			$this->config,
@@ -396,7 +396,7 @@ class phpbb_attachment_upload_test extends \phpbb_database_test_case
 				->with(104, 'ATTACHED_IMAGE_NOT_IMAGE')
 				->willReturn(false);
 		}
-		$this->upload = new \phpbb\attachment\upload(
+		$this->upload = new \phpbb\attachment\drivers\local\upload(
 			$this->auth,
 			$this->cache,
 			$this->config,
